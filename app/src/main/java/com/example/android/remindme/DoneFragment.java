@@ -44,4 +44,9 @@ public class DoneFragment extends Fragment {
 
         return rootView;
     }
+
+
+    public void setRemindMeDataSource(RemindMeDataSource remindMeDataSource){
+        this.remindMeDataSource = remindMeDataSource;
+    }
 }

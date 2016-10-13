@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static String jsonUrl = "https://dl.dropboxusercontent.com/u/6890301/tasks.json";
 
     // Datasource
-    public RemindMeDataSource remindMeDataSource;
+    private RemindMeDataSource remindMeDataSource;
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -53,9 +53,13 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        viewPagerAdapter.addFragments(new PendingFragment(), "Pending");
+        PendingFragment pendingFragment = new PendingFragment();
+        pendingFragment.setRemindMeDataSource(remindMeDataSource);
+        viewPagerAdapter.addFragments(pendingFragment, "Pending");
 
-        viewPagerAdapter.addFragments(new DoneFragment(), "Done");
+        DoneFragment doneFragment = new DoneFragment();
+        doneFragment.setRemindMeDataSource(remindMeDataSource);
+        viewPagerAdapter.addFragments(doneFragment, "Done");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);

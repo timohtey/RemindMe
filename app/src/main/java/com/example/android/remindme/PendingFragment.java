@@ -7,11 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-
 import database.RemindMeDataSource;
 import model.ToDoEntry;
+
+import java.util.ArrayList;
 
 /**
  * Created by timohtey on 13/10/2016.
@@ -42,5 +41,9 @@ public class PendingFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         return rootView;
+    }
+
+    public void setRemindMeDataSource(RemindMeDataSource remindMeDataSource){
+        this.remindMeDataSource = remindMeDataSource;
     }
 }
