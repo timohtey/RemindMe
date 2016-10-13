@@ -49,9 +49,28 @@ public class RemindMeDataSource {
         database.insert(DatabaseHelper.TO_DO_ENTRY_TABLE_NAME, null, contentValues);
     }
 
-    public ArrayList<ToDoEntry> retrieveAllToDoEntries(){
+    public ArrayList<ToDoEntry> retrievePendingToDoEntries(){
         ArrayList<ToDoEntry> toDoEntries = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT * FROM " + DatabaseHelper.TO_DO_ENTRY_TABLE_NAME, null);
+        Cursor cursor = database.query(DatabaseHelper.TO_DO_ENTRY_TABLE_NAME, null, DatabaseHelper.TO_DO_ENTRY_STATE + " = " + 0 + "",
+                null, null, null, null);
+
+        try {
+            while (cursor.moveToNext()) {
+                ToDoEntry toDoEntry = new ToDoEntry(cursor.getString(1), cursor.getInt(2));
+                toDoEntry.setToDoEntryId(cursor.getInt(0));
+                toDoEntries.add(toDoEntry);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return toDoEntries;
+    }
+
+    public ArrayList<ToDoEntry> retrieveDoneToDoEntries(){
+        ArrayList<ToDoEntry> toDoEntries = new ArrayList<>();
+        Cursor cursor = database.query(DatabaseHelper.TO_DO_ENTRY_TABLE_NAME, null, DatabaseHelper.TO_DO_ENTRY_STATE + " = " + 1 + "",
+                null, null, null, null);
 
         try {
             while (cursor.moveToNext()) {

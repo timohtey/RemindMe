@@ -19,8 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import database.RemindMeDataSource;
 import json.HttpHandler;
 import model.ToDoEntry;
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static String jsonUrl = "https://dl.dropboxusercontent.com/u/6890301/tasks.json";
 
     // Datasource
-    public static RemindMeDataSource remindMeDataSource;
+    public RemindMeDataSource remindMeDataSource;
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -54,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+
         viewPagerAdapter.addFragments(new PendingFragment(), "Pending");
+
         viewPagerAdapter.addFragments(new DoneFragment(), "Done");
+
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Add a pending to do task", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -138,12 +139,6 @@ public class MainActivity extends AppCompatActivity {
 
                         // Insert retrieved data to the database
                         remindMeDataSource.addToDoEntry(toDoEntry);
-                        ArrayList<ToDoEntry> toDoEntries = remindMeDataSource.retrieveAllToDoEntries();
-                        for(int j = 0; j < toDoEntries.size(); j++) {
-                            Log.i("j", j + ": " + toDoEntries.get(j).getToDoEntryId());
-                            Log.i("j", j + ": " + toDoEntries.get(j).getToDoEntryName());
-                            Log.i("j", j + ": " + toDoEntries.get(j).getToDoEntryState());
-                        }
                     }
                 } catch (final JSONException e) {
                     runOnUiThread(new Runnable() {
