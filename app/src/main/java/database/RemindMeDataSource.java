@@ -50,7 +50,7 @@ public class RemindMeDataSource {
     }
 
     public ArrayList<ToDoEntry> retrieveAllToDoEntries(){
-        ArrayList<ToDoEntry> toDoEntries = new ArrayList<ToDoEntry>();
+        ArrayList<ToDoEntry> toDoEntries = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * FROM " + DatabaseHelper.TO_DO_ENTRY_TABLE_NAME, null);
 
         try {

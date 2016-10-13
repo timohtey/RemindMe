@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,16 +26,38 @@ import json.HttpHandler;
 import model.ToDoEntry;
 
 public class MainActivity extends AppCompatActivity {
+    // JSON related variables
     private ProgressDialog pDialog;
     private static String jsonUrl = "https://dl.dropboxusercontent.com/u/6890301/tasks.json";
+
+    // Datasource
     public static RemindMeDataSource remindMeDataSource;
+
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        remindMeDataSource = new RemindMeDataSource(this);
+        remindMeDataSource.open();
+
+        new GetToDoEntries().execute();
+
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragments(new PendingFragment(), "Pending");
+        viewPagerAdapter.addFragments(new DoneFragment(), "Done");
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,11 +67,6 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        remindMeDataSource = new RemindMeDataSource(this);
-        remindMeDataSource.open();
-
-        new GetToDoEntries().execute();
     }
 
     @Override
