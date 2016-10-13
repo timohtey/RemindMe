@@ -2,8 +2,9 @@ package model;
 
 /**
  * Created by timohtey on 13/10/2016.
+ *
+ * This class serves as the model for the To Do Entry.
  */
-
 public class ToDoEntry {
     private int toDoEntryId;
     private String toDoEntryName;

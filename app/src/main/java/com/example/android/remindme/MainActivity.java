@@ -3,16 +3,12 @@ package com.example.android.remindme;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -32,18 +28,23 @@ public class MainActivity extends AppCompatActivity {
     private RemindMeDataSource remindMeDataSource;
 
     private Toolbar toolbar;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-    private ViewPagerAdapter viewPagerAdapter;
+    public static TabLayout tabLayout;
+    public static ViewPager viewPager;
+    public static ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Database
         remindMeDataSource = new RemindMeDataSource(this);
         remindMeDataSource.open();
 
-        new GetToDoEntries().execute();
+        // If no existing to do entries in the database
+        if(remindMeDataSource.retrieveAllToDoEntries().isEmpty()) {
+            // Retrieve To Do Entries from JSON URL
+            new GetToDoEntries().execute();
+        }
 
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -53,25 +54,18 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
+        // Fragment for the Pending tasks
         PendingFragment pendingFragment = new PendingFragment();
         pendingFragment.setRemindMeDataSource(remindMeDataSource);
         viewPagerAdapter.addFragments(pendingFragment, "Pending");
 
+        // Fragment for the Done tasks
         DoneFragment doneFragment = new DoneFragment();
         doneFragment.setRemindMeDataSource(remindMeDataSource);
         viewPagerAdapter.addFragments(doneFragment, "Done");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Add a pending to do task", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
@@ -100,13 +94,12 @@ public class MainActivity extends AppCompatActivity {
      * Async task class to get json by making HTTP call
      */
     private class GetToDoEntries extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
+            // Show progress dialog
             pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage("Loading data...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -118,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
             // Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(jsonUrl);
 
-            Log.i("JSON", "Response from url: " + jsonStr);
-
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
@@ -127,16 +118,13 @@ public class MainActivity extends AppCompatActivity {
                     // Getting JSON Array node
                     JSONArray toDoEntriesData = jsonObj.getJSONArray("data");
 
-                    // Looping through All Data
+                    // Loop through all of the Data
                     for (int i = 0; i < toDoEntriesData.length(); i++) {
                         JSONObject c = toDoEntriesData.getJSONObject(i);
 
                         int id = c.getInt("id");
-                        Log.i("JSON", "** ID: " + id);
                         String name = c.getString("name");
-                        Log.i("JSON", "** Description: " + name);
                         int state = c.getInt("state");
-                        Log.i("JSON", "** State: " + state);
 
                         ToDoEntry toDoEntry = new ToDoEntry(name, state);
                         toDoEntry.setToDoEntryId(id);
@@ -154,14 +142,13 @@ public class MainActivity extends AppCompatActivity {
                                     .show();
                         }
                     });
-
                 }
             } else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "Check internet connection.",
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
@@ -179,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
             if (pDialog.isShowing()) {
                 pDialog.dismiss();
             }
+
+            // Force Refresh
+            viewPager.setAdapter(viewPagerAdapter);
+            tabLayout.setupWithViewPager(viewPager);
         }
     }
 }

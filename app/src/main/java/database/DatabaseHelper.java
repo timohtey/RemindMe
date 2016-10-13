@@ -50,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuilder createToDoEntryTable = new StringBuilder();
 
         createToDoEntryTable.append("CREATE TABLE IF NOT EXISTS " + TO_DO_ENTRY_TABLE_NAME + "(");
-        createToDoEntryTable.append(    TO_DO_ENTRY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, ");
+        createToDoEntryTable.append(    TO_DO_ENTRY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ");
         createToDoEntryTable.append(    TO_DO_ENTRY_NAME + " TEXT, ");
         createToDoEntryTable.append(    TO_DO_ENTRY_STATE + " INTEGER NOT NULL");
         createToDoEntryTable.append(")");
